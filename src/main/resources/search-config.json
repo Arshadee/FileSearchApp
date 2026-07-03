@@ -1,0 +1,36 @@
+{
+  "root": "C:\\Development_Engine_Release_Master_New\\Backend\\engine",
+  "searchType": "AND",
+  "inclFileNames": false,
+  "inclTxtFileContent": true,
+  "noCase": true,
+  "txtFileTypes": [".java" ],
+  "exclusionList": [
+    "windows", 
+    "system", 
+    "programdata", 
+    ".m2", 
+    ".m2_bu", 
+    ".m2_bu2", 
+    "target", 
+    "biosite", 
+    "outputs_changeCombo_perms", 
+    "afrocastwebsite", 
+    "biositefrontend", 
+    "biositebackend", 
+    "oem", 
+    "veolia", 
+    "NascenceProj", 
+    "scala", 
+    "dell"
+  ],
+  "extentionsToExclude": [".zip", ".lnk"],
+  "queries": [
+    { "value": ".java", "include": true },
+    { "value": "ReleaseNotes", "include": true }
+  ],
+  "keyWordItems": [
+    { "value": "activityQuery", "include": true },
+    { "value": "v2", "include": true }
+  ]
+}
