@@ -12,17 +12,17 @@ import lombok.Data;
 @AllArgsConstructor
 public class KeyWordItem implements IKeyWordItem {
 
-    private String keyWord;
+    private String value;
     private boolean include;
 
-    public KeyWordItem(String keyWord) {
-        this.keyWord = keyWord;
+    public KeyWordItem(String value) {
+        this.value = value;
         this.include = true;
     }
 
     public String toString() {
 
-        return include? "Includes - "+keyWord+" " : "Excludes - "+keyWord+" ";
+        return include? "Includes - "+value+" " : "Excludes - "+value+" ";
     }
 
 }

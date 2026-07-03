@@ -15,7 +15,7 @@ public class AutoUIConfigUtilities {
 
         for (KeyWordItem keyWordItem : keywordItems) {
 
-            String keyWord = keyWordItem.getKeyWord();
+            String keyWord = keyWordItem.getValue();
 
             if(noCase){
                 keyWord = keyWord.toLowerCase();
@@ -41,9 +41,9 @@ public class AutoUIConfigUtilities {
 //                new KeyWordItem("catch (Exception e)", true),
 //                new KeyWordItem("catch (Throwable t)", true),
         return (
-                (contents.toLowerCase().contains(keywordItems[0].getKeyWord().toLowerCase()) &&
-                    ( contents.toLowerCase().contains(keywordItems[1].getKeyWord().toLowerCase()) ||
-                      contents.toLowerCase().contains(keywordItems[2].getKeyWord().toLowerCase()) )
+                (contents.toLowerCase().contains(keywordItems[0].getValue().toLowerCase()) &&
+                    ( contents.toLowerCase().contains(keywordItems[1].getValue().toLowerCase()) ||
+                      contents.toLowerCase().contains(keywordItems[2].getValue().toLowerCase()) )
                 )
 
         );
@@ -58,14 +58,14 @@ public class AutoUIConfigUtilities {
         boolean predicate = false;
         for (KeyWordItem keyWordItem : keywordItems) {
 
-            String keyWord = keyWordItem.getKeyWord();
+            String keyWord = keyWordItem.getValue();
 
             if(noCase){
                 keyWord = keyWord.toLowerCase();
                 contents = contents.toLowerCase();
             }
 
-            String keyWordSearch = keyWordItem.getKeyWord().toLowerCase();
+            String keyWordSearch = keyWordItem.getValue().toLowerCase();
             predicate = keyWordItem.isInclude() ? predicate ||
                     contents.contains(keyWord)
                     : predicate || !contents.contains(keyWord);
@@ -163,9 +163,9 @@ System.out.println("criteriaFileContentDesc: " + criteriaFileContentDesc);
         for(KeyWordItem q : keyWordItems) {
             String inclExclIndicator = q.isInclude() ? "" : "NOT ";
             if (counter == 0 ){
-                criteriaDesc += " "+inclExclIndicator + q.getKeyWord();
+                criteriaDesc += " "+inclExclIndicator + q.getValue();
             } else {
-                criteriaDesc += " " + searchType + " " + inclExclIndicator + q.getKeyWord();
+                criteriaDesc += " " + searchType + " " + inclExclIndicator + q.getValue();
             }
             counter++;
         }

@@ -2,8 +2,8 @@ package org.filesearch;
 
 public interface IKeyWordItem {
 
-    String getKeyWord();
-    void setKeyWord(String keyWord);
+    String getValue();
+    void setValue(String keyWord);
 
     boolean isInclude();
 
