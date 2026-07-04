@@ -1,0 +1,35 @@
+{
+  "root": "C:\\Users\\ArshadMayet\\Desktop",
+  "searchType": "DYN",
+  "inclFileNames": false,
+  "inclTxtFileContent": true,
+  "noCase": true,
+  "txtFileTypes": [".txt", ".java", ".xml", ".properties"],
+  "exclusionList": [
+    "windows", 
+    "system", 
+    "programdata", 
+    ".m2", 
+    ".m2_bu", 
+    ".m2_bu2", 
+    "target", 
+    "biosite", 
+    "outputs_changeCombo_perms", 
+    "afrocastwebsite", 
+    "biositefrontend", 
+    "biositebackend", 
+    "oem", 
+    "veolia", 
+    "NascenceProj", 
+    "scala", 
+    "dell"
+  ],
+  "extentionsToExclude": [".zip", ".lnk"],
+  "queries": [],
+ "keyWordItems": [
+    { "value": "implements JavaDelegate", "include": true },
+    { "value": "catch (Exception e)", "include": true },
+    { "value": "catch (Throwable t)", "include": true }
+  ],
+  "formula": "$0 && ($1 || $2)"
+}

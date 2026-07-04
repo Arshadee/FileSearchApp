@@ -24,6 +24,7 @@ public class AutoUIConfigDyn implements UIConfigInterface {
     private boolean inclTxtFileContent = true;
     private String searchType = "OR";
     private boolean noCase = true;
+    private String formula = "";
 
     // Track the directory path where the output file must be saved
     private String outputDir = "src/main/resources/";
@@ -60,6 +61,7 @@ public class AutoUIConfigDyn implements UIConfigInterface {
             if (rootNode.has("inclFileNames")) this.inclFileNames = rootNode.get("inclFileNames").asBoolean();
             if (rootNode.has("inclTxtFileContent")) this.inclTxtFileContent = rootNode.get("inclTxtFileContent").asBoolean();
             if (rootNode.has("noCase")) this.noCase = rootNode.get("noCase").asBoolean();
+            if (rootNode.has("formula")) this.formula = rootNode.get("formula").asText();
 
             if (rootNode.has("txtFileTypes") && rootNode.get("txtFileTypes").isArray()) {
                 List<String> types = new ArrayList<>();
@@ -107,8 +109,8 @@ public class AutoUIConfigDyn implements UIConfigInterface {
     public void executeConfig() {
         System.out.println("Running . . .");
 
-        String criteriaFileNameDesc = AutoUIConfigUtilities.getCriteriaFileNameDesc(root, inclFileNames, qrys, searchType);
-        String criteriaFileContentDesc = AutoUIConfigUtilities.getCriteriaFileContentDesc(root, inclTxtFileContent, keyWordItems, txtFileTypes, searchType);
+        String criteriaFileNameDesc = AutoUIConfigUtilitiesMod.getCriteriaFileNameDesc(root, inclFileNames, qrys, searchType, formula);
+        String criteriaFileContentDesc = AutoUIConfigUtilitiesMod.getCriteriaFileContentDesc(root, inclTxtFileContent, keyWordItems, txtFileTypes, searchType, formula);
         String criteriaDesc = criteriaFileNameDesc + criteriaFileContentDesc;
         String queryDescription = "Search " + criteriaDesc;
 
@@ -140,16 +142,16 @@ public class AutoUIConfigDyn implements UIConfigInterface {
                 },
                 (file, contents, nocase, keywordItems) -> {
                     if (searchType.equals("OR")) {
-                        return AutoUIConfigUtilities.predicateOR(file, contents, keywordItems, nocase);
+                        return AutoUIConfigUtilitiesMod.predicateOR(file, contents, keywordItems, nocase);
                     } else if (searchType.equals("AND")) {
-                        return AutoUIConfigUtilities.predicateAND(file, contents, keywordItems, nocase);
+                        return AutoUIConfigUtilitiesMod.predicateAND(file, contents, keywordItems, nocase);
                     } else {
-                        return AutoUIConfigUtilities.predicateDYN(file, contents, keywordItems, nocase);
+                        return AutoUIConfigUtilitiesMod.predicateDYN(file, contents, keywordItems, nocase, this.formula);
                     }
                 });
 
         String filename = root.substring(0, 1) + "_" + criteriaDesc.replace(" ", "_");
-        filename = AutoUIConfigUtilities.sanitizeFilename(filename);
+        filename = AutoUIConfigUtilitiesMod.sanitizeFilename(filename);
 
         // 3. Combined file output string using the mapped context folder variable
         String filePath = this.outputDir + "searchResultMT_wrk_" + filename + "mod.html";
