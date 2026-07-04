@@ -90,11 +90,22 @@ public class AutoUIConfigDyn implements UIConfigInterface {
             if (rootNode.has("keyWordItems") && rootNode.get("keyWordItems").isArray()) {
                 List<KeyWordItem> items = new ArrayList<>();
                 for (JsonNode node : rootNode.get("keyWordItems")) {
-                    String value = node.isObject() && node.has("value") ? node.get("value").asText() : node.asText();
+                    String value = "";
+                    boolean include = true;
+
+                    if (node.isObject()) {
+                        value = node.has("value") ? node.get("value").asText() : "";
+                        include = node.has("include") ? node.get("include").asBoolean() : true;
+                    } else {
+                        value = node.asText();
+                    }
+
                     if (!value.isEmpty()) {
-                        items.add(new KeyWordItem(value, true));
+                        items.add(new KeyWordItem(value, include));
                     }
                 }
+
+
                 if (!items.isEmpty()) {
                     this.keyWordItems = items.toArray(new KeyWordItem[0]);
                 }
@@ -111,6 +122,14 @@ public class AutoUIConfigDyn implements UIConfigInterface {
 
         String criteriaFileNameDesc = AutoUIConfigUtilitiesMod.getCriteriaFileNameDesc(root, inclFileNames, qrys, searchType, formula);
         String criteriaFileContentDesc = AutoUIConfigUtilitiesMod.getCriteriaFileContentDesc(root, inclTxtFileContent, keyWordItems, txtFileTypes, searchType, formula);
+        // Replace formula index placeholders with real values for human readability
+        if ("DYN".equalsIgnoreCase(this.searchType) && criteriaFileContentDesc != null) {
+            for (int i = this.keyWordItems.length - 1; i >= 0; i--) {
+                KeyWordItem item = this.keyWordItems[i];
+                String displayValue = item.isInclude() ? "[" + item.getValue() + "]" : "NOT [" + item.getValue() + "]";
+                criteriaFileContentDesc = criteriaFileContentDesc.replace("$" + i, displayValue);
+            }
+        }
         String criteriaDesc = criteriaFileNameDesc + criteriaFileContentDesc;
         String queryDescription = "Search " + criteriaDesc;
 

@@ -20,6 +20,10 @@ public class KeyWordItem implements IKeyWordItem {
         this.include = true;
     }
 
+    public String getKeyWord() {
+        return this.value;
+    }
+
     public String toString() {
 
         return include? "Includes - "+value+" " : "Excludes - "+value+" ";

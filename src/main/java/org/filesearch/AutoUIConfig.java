@@ -64,9 +64,9 @@ public class AutoUIConfig implements UIConfigInterface {
 //        String root = "C:\\Development\\ice-s3-client";
 
 //   String root="C:\\demos\\financial-freedom-bot";
-// String root = "C:\\Development_Engine_Release_Master_New";
+ String root = "C:\\Development_Engine_Release_Master_New";
  //   String root = "C:\\Development_Engine_Release_Master_New\\Backend\\common";
- String root = "C:\\Development_Engine_Release_Master_New\\Backend\\engine";
+// String root = "C:\\Development_Engine_Release_Master_New\\Backend\\engine";
 //     String root = "C:\\Development_Engine_Release_Master_New\\Backend\\mlcs";
 //     String root = "C:\\Development_Engine_Release_Master_New\\Backend\\poe";
 //   String root = "C:\\Development_Engine_Release_Master_New\\Backend\\auth";
@@ -265,8 +265,12 @@ boolean inclFileNames = false;
 //            new KeyWordItem("findoneuser", true),
 //            new KeyWordItem("user", true),
 
-           new KeyWordItem("activityQuery", true),
-            new KeyWordItem("@Rest", true),
+//           new KeyWordItem("activityQuery", true),
+//            new KeyWordItem("@Rest", true),
+
+            new KeyWordItem("implements JavaDelegate", true),
+            new KeyWordItem("catch (Exception e)", true),
+            new KeyWordItem("2344", false),
 
     };
 

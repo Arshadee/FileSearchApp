@@ -46,7 +46,8 @@ public class AutoUIConfigUtilitiesMod {
         for (int i = keywordItems.length - 1; i >= 0; i--) {
             String target = noCase ? keywordItems[i].getValue().toLowerCase() : keywordItems[i].getValue();
             boolean isPresent = searchBody.contains(target);
-            expr = expr.replace("$" + i, isPresent ? "T" : "F");
+            boolean tokenTruthStatus = keywordItems[i].isInclude() ? isPresent : !isPresent;
+            expr = expr.replace("$" + i, tokenTruthStatus ? "T" : "F");
         }
 
         return evaluateBooleanExpression(expr);
