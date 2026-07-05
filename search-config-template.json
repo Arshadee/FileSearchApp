@@ -1,0 +1,16 @@
+{
+  "root": "C:\\Change\\This\\To\\Your\\Target\\Directory",
+  "searchType": "DYN",
+  "inclFileNames": false,
+  "inclTxtFileContent": true,
+  "noCase": true,
+  "txtFileTypes": [".txt", ".java", ".xml", ".properties"],
+  "exclusionList": ["windows", "system", "target", ".m2"],
+  "extentionsToExclude": [".zip", ".lnk"],
+  "queries": [],
+  "keyWordItems": [
+    { "value": "exampleTermA", "include": true },
+    { "value": "exampleTermB", "include": true }
+  ],
+  "formula": "$0 && $1"
+}
