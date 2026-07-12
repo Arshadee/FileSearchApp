@@ -1,0 +1,26 @@
+Highly Effective Strategies for Scoping PDF Searches
+-----------------------------------------------------
+* Segment by Directory (Targeted Paths): Instead of pointing the tool at a massive root 
+  directory like C:\Users\ArshadMayet\Desktop for a PDF search, restrict the target path 
+  in your search-config.json to specific, high-probability folders (e.g., pointing directly 
+  to a specific project or finance folder).
+
+* Run Hybrid/Dual Configurations: * Use a broad, full-desktop scope configuration for fast, 
+  plain-text extensions (.java, .properties, .xml, .txt) when you need instant results across 
+  your entire drive.
+
+  - Keep a separate, dedicated configuration file with a highly narrow, restricted folder scope 
+    specifically for when you must search inside PDF contents.
+
+* Leverage File-Size Thresholds (Optional Enhancement): If you ever want to tweak the code down 
+  the line, you can add a file-size check for PDFs. Skipping PDFs larger than a few megabytes 
+  prevents massive multi-hundred-page documents from hijacking a worker thread and slowing down 
+  the rest of the pool.
+
+Summary
+--------
+By organizing your workflows to keep PDF searches focused on smaller, specific scopes, you get 
+the absolute best of both worlds: you preserve the high-speed capability of your multi-threaded 
+architecture for daily dev files, and you keep PDF processing times entirely under your control
+when deadlines matter. You've engineered a fantastic tool and now have the perfect blueprint to 
+operate it efficiently!

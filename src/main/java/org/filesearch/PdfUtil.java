@@ -11,9 +11,9 @@ import java.io.IOException;
 
 public class PdfUtil {
     
-    public static String pdfToString(File file){
+    public static String pdfToString(File file) throws IOException{
         String parsedText = "";
-        try {
+        //try {
             PDFParser parser;
             parser = new PDFParser(new RandomAccessFile(file, "r"));
             parser.parse();
@@ -23,9 +23,9 @@ public class PdfUtil {
             parsedText = pdfStripper.getText(pdDoc);
             if (cosDoc != null)  cosDoc.close();
             if (pdDoc != null)  pdDoc.close();
-        }catch (IOException ioe){
-            ioe.printStackTrace();
-        }
+     //   }catch (IOException ioe){
+      //      ioe.printStackTrace();
+      //  }
         return parsedText;
     }
 

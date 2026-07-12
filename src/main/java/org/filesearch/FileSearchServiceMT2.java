@@ -19,6 +19,11 @@ import java.util.concurrent.Executors;
  */
 public class FileSearchServiceMT2 implements ISearchService {
 
+    static {
+        System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.NoOpLog");
+        java.util.logging.Logger.getLogger("org.apache.pdfbox").setLevel(java.util.logging.Level.OFF);
+    }
+
     private final List<String> results = new ArrayList<>(); // Use synchronized list
     private long hitCount = 0;
 
@@ -102,10 +107,15 @@ public class FileSearchServiceMT2 implements ISearchService {
         executor.shutdown();
 
         /*  removed new  - to use virtual threads  */
-        while(!executor.isTerminated()){
-        // to converge all threads
+        try {
+            // Let the main thread sleep cleanly instead of pegging a CPU core at 100%
+            if (!executor.awaitTermination(1, java.util.concurrent.TimeUnit.HOURS)) {
+                executor.shutdownNow();
+            }
+        } catch (InterruptedException ie) {
+            executor.shutdownNow();
+            Thread.currentThread().interrupt();
         }
-        // end cached threads convergence & termination
 
         long end = System.currentTimeMillis();
         Collections.sort(results);
@@ -145,8 +155,25 @@ public class FileSearchServiceMT2 implements ISearchService {
                 System.out.println("no access permission for file " + file.getName());
             }catch (OutOfMemoryError oom) {
                 oom.printStackTrace();
+            } catch(RuntimeException re) {
+                // Safe check for null messages to prevent a secondary NullPointerException
+                String msg = re.getMessage() != null ? re.getMessage().toLowerCase() : "";
+                if ((re.getCause() != null && re.getCause() instanceof org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException)
+                        || msg.contains("password") || msg.contains("decrypt")) {
+                    System.out.println("Skipping encrypted/password-protected file: " + file.getAbsolutePath());
+                } else {
+                    // Log it cleanly instead of throwing, keeping the pool thread alive
+                    System.err.println("Runtime exception parsing file " + file.getName() + ": " + re.getMessage());
+                }
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                // Safe check for null messages
+                String msg = e.getMessage() != null ? e.getMessage().toLowerCase() : "";
+                if (msg.contains("password") || msg.contains("decrypt")) {
+                    System.out.println("Skipping encrypted/password-protected file: " + file.getAbsolutePath());
+                } else {
+                    // Log it cleanly instead of re-throwing a wrapped RuntimeException
+                    System.err.println("IO Error reading file " + file.getName() + ": " + e.getMessage());
+                }
             }
         }
 
@@ -154,15 +181,21 @@ public class FileSearchServiceMT2 implements ISearchService {
 
             if(!file.canExecute() || !file.canRead()) return;
 
-            byte[] bytes;
+            String fileContent = "";
             if(file.getName().toLowerCase().endsWith(".pdf")){
-                PdfUtil.pdfToString(file.getAbsoluteFile());
-                bytes = PdfUtil.pdfToString(file.getAbsoluteFile()).getBytes();
-            }else {
-                bytes = Files.readAllBytes(Paths.get(file.getAbsolutePath()));
+                try {
+                    // Fix the performance bug: Parse only ONCE directly to a string
+                    fileContent = PdfUtil.pdfToString(file.getAbsoluteFile());
+                    if (fileContent == null) fileContent = "";
+                } catch (Exception e) {
+                    // Trap the EOF and corruption crashes safely here
+                    System.err.println("Skipping invalid or corrupted PDF: " + file.getAbsolutePath() + " (" + e.getMessage() + ")");
+                    return; // Gracefully drop out of this thread worker
+                }
+            } else {
+                byte[] bytes = Files.readAllBytes(Paths.get(file.getAbsolutePath()));
+                fileContent = new String(bytes);
             }
-
-            String fileContent = new String (bytes);
 
             //if(queryBuilder.buildPredicate(fileContent, fileContentKeyWords)) {
             if(queryBuilder.buildPredicate(file,fileContent, isNoCase, fileContentKeyWords)) {

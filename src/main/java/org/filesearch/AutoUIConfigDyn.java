@@ -87,6 +87,29 @@ public class AutoUIConfigDyn implements UIConfigInterface {
                 this.exclusionList = exclusions;
             }
 
+            if (rootNode.has("queries") && rootNode.get("queries").isArray()) {
+                List<KeyWordItem> queryItems = new ArrayList<>();
+                for (JsonNode node : rootNode.get("queries")) {
+                    String value = "";
+                    boolean include = true;
+
+                    if (node.isObject()) {
+                        value = node.has("value") ? node.get("value").asText() : "";
+                        include = node.has("include") ? node.get("include").asBoolean() : true;
+                    } else {
+                        value = node.asText();
+                    }
+
+                    if (!value.isEmpty()) {
+                        queryItems.add(new KeyWordItem(value, include));
+                    }
+                }
+
+                if (!queryItems.isEmpty()) {
+                    this.qrys = queryItems.toArray(new KeyWordItem[0]);
+                }
+            }
+
             if (rootNode.has("keyWordItems") && rootNode.get("keyWordItems").isArray()) {
                 List<KeyWordItem> items = new ArrayList<>();
                 for (JsonNode node : rootNode.get("keyWordItems")) {
