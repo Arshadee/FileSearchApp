@@ -26,6 +26,7 @@ public class FileSearchServiceMT2 implements ISearchService {
 
     private final List<String> results = new ArrayList<>(); // Use synchronized list
     private long hitCount = 0;
+    public static final ThreadLocal<KeyWordItem[]> CURRENT_THREAD_KEYWORDS = new ThreadLocal<>();
 
 
     private ExecutorService executor = Executors.newCachedThreadPool(); // rem - to use virtual threads
@@ -48,13 +49,11 @@ public class FileSearchServiceMT2 implements ISearchService {
         long fileCount=  (fileOrDirExist)? 1 : 0;
 
         boolean localToInclTxtFileContent = requestObject.getQrys().length==0 ? false : requestObject.isInclTxtFileContent();
-        //boolean localToInclTxtFileContent = true; //REMOVE
 
         while(!stack.isEmpty() && fileOrDirExist){
             File file = stack.pop();
 
            // if(searchHelper.toSearchFileByName(file, requestObject.getExclusionList(), requestObject.getQrys(), requestObject.isInclFileNames())) {
-           // if(true){ //REMOVE
            if( searchHelper.toSearchFileByName(file, requestObject.getExclusionList(), requestObject.isInclFileNames()) &&
                //queryBuilder.buildPredicate(file.getAbsolutePath(), requestObject.getQrys())) {
                queryBuilder.buildPredicate(file,file.getAbsolutePath(), requestObject.isNoCase(), requestObject.getQrys())) {
@@ -66,8 +65,14 @@ public class FileSearchServiceMT2 implements ISearchService {
 //                results.add(fileEntry);
 
 //                results.add(file.getAbsolutePath());
-                    results.add(entryFormater.modify(file.getAbsolutePath(),false));
-                    hitCount++;
+                  try {
+                    CURRENT_THREAD_KEYWORDS.set(requestObject.getFileContentKeyWords());
+                    results.add(entryFormater.modify(file.getAbsolutePath(), false));
+                  } finally {
+                    CURRENT_THREAD_KEYWORDS.remove();
+                  }
+
+                  hitCount++;
                 }
 
             } else if(searchHelper.toSearchTxtFileContents(file, requestObject.getTxtFileTypes(),
@@ -75,9 +80,17 @@ public class FileSearchServiceMT2 implements ISearchService {
                    requestObject.isInclTxtFileContent(), requestObject.getExclusionList())) {
 
                 /* Create a thread to search file contents  - same code for virtual threads */
+               // 1. Get the shared keywords array
+               KeyWordItem[] sharedKeywords = requestObject.getFileContentKeyWords();
+
+                // 2. Create a deep copy clone specifically for this worker thread's scope
+               KeyWordItem[] threadSafeKeywords = new KeyWordItem[sharedKeywords.length];
+               for (int i = 0; i < sharedKeywords.length; i++) {
+                   threadSafeKeywords[i] = new KeyWordItem(sharedKeywords[i]);
+               }
                 Runnable worker = new SearchTxtThread(
                         file,
-                        requestObject.getFileContentKeyWords(),
+                        threadSafeKeywords,
                         queryBuilder,
                         entryFormater,
                         requestObject.isNoCase());
@@ -150,6 +163,7 @@ public class FileSearchServiceMT2 implements ISearchService {
         @Override
         public void run() {
             try {
+                CURRENT_THREAD_KEYWORDS.set(this.fileContentKeyWords);
                 processTxtFileContentSearch();
             }catch ( AccessDeniedException ade) {
                 System.out.println("no access permission for file " + file.getName());
@@ -174,7 +188,10 @@ public class FileSearchServiceMT2 implements ISearchService {
                     // Log it cleanly instead of re-throwing a wrapped RuntimeException
                     System.err.println("IO Error reading file " + file.getName() + ": " + e.getMessage());
                 }
-            }
+            } finally {
+            // Always clean up the thread context to avoid memory leaks
+            CURRENT_THREAD_KEYWORDS.remove();
+         }
         }
 
         private void processTxtFileContentSearch() throws OutOfMemoryError, IOException {
@@ -207,8 +224,8 @@ public class FileSearchServiceMT2 implements ISearchService {
 //                results.add(fileEntry);
 
 //                results.add(file.getAbsolutePath());
-                    results.add(entryPresenter.modify(file.getAbsolutePath(),true));
-                    hitCount++;
+                  results.add(entryPresenter.modify(file.getAbsolutePath(), true));
+                  hitCount++;
                 }
             }
         }

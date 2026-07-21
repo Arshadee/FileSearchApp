@@ -20,6 +20,11 @@ public class KeyWordItem implements IKeyWordItem {
         this.include = true;
     }
 
+    public KeyWordItem(KeyWordItem other) {
+        this.value = other.value;
+        this.include = other.include;
+    }
+
     public String getKeyWord() {
         return this.value;
     }

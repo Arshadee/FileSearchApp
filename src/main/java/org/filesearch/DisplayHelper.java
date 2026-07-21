@@ -127,7 +127,21 @@ public class DisplayHelper extends org.filesearch.common.DisplayHelper{
 
     }
 
-    public static String getFileEntry(String filePath, List<String> keyWords){
+    public static String getFileEntry(String filePath, List<String> keyWords) {
+
+        // 1. Intercept the thread-isolated keyword structures if they exist
+        KeyWordItem[] threadIsolatedItems = org.filesearch.FileSearchServiceMT2.CURRENT_THREAD_KEYWORDS.get();
+
+        if (threadIsolatedItems != null) {
+            // 2. Build the list dynamically using only the matches marked true by this specific worker thread
+            List<String> isolatedMatches = new ArrayList<>();
+            for (KeyWordItem item : threadIsolatedItems) {
+                if (item.isInclude()) {
+                    isolatedMatches.add(item.toString());
+                }
+            }
+            keyWords = isolatedMatches;
+        }
 
         String keywordString = "<b>MATCHES KEYWORDS</b><br>"+String.join(", <br>", keyWords);
 
