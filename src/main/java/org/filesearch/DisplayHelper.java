@@ -136,7 +136,7 @@ public class DisplayHelper extends org.filesearch.common.DisplayHelper{
             // 2. Build the list dynamically using only the matches marked true by this specific worker thread
             List<String> isolatedMatches = new ArrayList<>();
             for (KeyWordItem item : threadIsolatedItems) {
-                if (item.isInclude()) {
+                if ((item.isInclude() && item.isFound()) || (!item.isInclude() && !item.isFound())) {
                     isolatedMatches.add(item.toString());
                 }
             }

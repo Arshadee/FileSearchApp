@@ -214,7 +214,18 @@ public class FileSearchServiceMT2 implements ISearchService {
                 fileContent = new String(bytes);
             }
 
-            //if(queryBuilder.buildPredicate(fileContent, fileContentKeyWords)) {
+            // --- ADD THIS MATCH LOGIC --- to fix keyword tool tip bug
+            if (fileContent != null && !fileContent.isEmpty()) {
+                String searchContent = isNoCase ? fileContent.toLowerCase() : fileContent;
+                for (KeyWordItem item : fileContentKeyWords) {
+                    String target = isNoCase ? item.getKeyWord().toLowerCase() : item.getKeyWord();
+                    if (searchContent.contains(target)) {
+                        item.setFound(true); // Mark match on this thread's cloned item
+                    }
+                }
+            }
+            // ----------------------------
+
             if(queryBuilder.buildPredicate(file,fileContent, isNoCase, fileContentKeyWords)) {
 
                 System.out.println("KeyWordItem in file contents ======>["+file.getAbsolutePath()+"]");
